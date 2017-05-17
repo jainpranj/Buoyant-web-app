@@ -1,4 +1,4 @@
-from flask import Flask,request
+from flask import Flask,request,render_template
 import json
 import requests
 app = Flask(__name__)
@@ -41,7 +41,8 @@ def health():
 			response = app.response_class(response=json.dumps(data),status=200,mimetype='application/json')
 			return response
 	except requests.exceptions.RequestException:
-		return "the linkerd application is not running"
+		response = app.response_class(response=json.dumps(data),status=200,mimetype='application/json')
+		return response
     
 
 @app.route('/shift',methods = ['GET'])
@@ -57,15 +58,15 @@ def balance_traffic():
 		print(response.status_code)
 		return str(response.status_code)
 	except requests.exceptions.RequestException:
-		return "the linkerd application is not running"	
+		return str("Service not running")
+		
 
 
-@app.route('/',methods = ['GET'])
-def welcome():
-
-	return "Welcome to Buoyant Take Home Project"
+@app.route("/")
+def index():
+  return render_template("index.html")
     
     
 
 if __name__ == '__main__':
-    app.run(debug=True,host='0.0.0.0')
+    app.run(debug=True)

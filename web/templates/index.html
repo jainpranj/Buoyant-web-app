@@ -1,0 +1,109 @@
+{% extends "layout.html" %}
+
+{% block content %}
+  <main class="hero-section">
+    <div class="container">
+    	      <div class="section-device">
+        <img src="static/img/device.png">
+      </div>
+      
+    	<div class="section-content"> Health Check
+    	<p><code>GET /health: Health Check</code> </p>
+    		<p>Returns status of 4 services linkerd, namerd, linkerd-tcp and linkerd-viz</p>
+    		<button class="btn-primary" id="health">Check Health</button>
+    		<div style="margin-top:10px;">
+    		<ul id="result">
+
+</ul>
+</div>
+</div>
+          	<div class="section-content"> Traffic Shifting 
+    	<p><code>PUT /shift/:N</code> </p>
+    		<p>:N is the percentage of traffic shifted. When N=0, all traffic goes to redis1. When N=100, all traffic goes to redis2.</p>
+    		<input id="N" type="text" pattern="[0-9]" title="N" required style="height: 37px;"></input>
+    		<button class="btn-primary" id="shift">Shift Traffic</button>
+    		<div id="statusCode"></div>
+
+
+      
+
+
+    </div>
+   	<div class="section-content"> Health Check every 5 minutes
+    	<p><code>GET /health: Health Check</code> </p>
+    		<p>Returns status of 4 services linkerd, namerd, linkerd-tcp and linkerd-viz</p>
+    		
+    		
+    		<ul id="cronresult">
+
+</ul>
+</div>
+</div>
+
+</div>
+
+
+            <div class="clearfix"></div>
+
+  </main>
+  <script type=text/javascript>
+  $(function() {
+    $('#health').bind('click', function() {
+      $.getJSON($SCRIPT_ROOT + '/health', function(data) {
+      	console.log(data);
+        $.each(data, function(k, v){color="glyphicon-remove-sign";
+        if(v=='up'){
+        	color="";
+        	 $("#result").append('<li>'+k +' '+v+' <span style="color:green" ><i class="glyphicon glyphicon-ok-sign "></i></span></li>');
+        }
+        else{
+        	
+        		 	 $("#result").append('<li>'+k +' '+v+' <span style="color:red" ><i class="glyphicon glyphicon-remove-sign "></i></span></li>');
+        }
+ 
+});
+      });
+      return false;
+    });
+  });
+    $(function() {
+    $('#shift').bind('click', function() {
+      $.getJSON($SCRIPT_ROOT + '/shift', {
+        N: $('#N').val()
+      },
+      	function(data) {
+      	console.log(data);
+       N=$('#N').val();
+  $("#statusCode").text("Traffic Distributed successfully with status code"+ " "+data+". Redis 1 load "+(100-N)+ "% "+"Redis 2 load "+(N)+" %");
+
+      });
+      return false;
+    });
+  });
+   
+$(document).ready(function() {
+    setInterval("ajaxd()",1000*60*5); // call every 10 seconds
+});
+
+function ajaxd() { 
+ 
+       $.getJSON($SCRIPT_ROOT + '/health', function(data) {
+      	console.log(data);
+      	$("#cronresult").text("");
+        $.each(data, function(k, v){color="glyphicon-remove-sign";
+        if(v=='up'){
+        	color="";
+        	 $("#cronresult").append('<li>'+k +' '+v+' <span style="color:green" ><i class="glyphicon glyphicon-ok-sign "></i></span></li>');
+        }
+        else{
+        	
+        		 	 $("#cronresult").append('<li>'+k +' '+v+' <span style="color:red" ><i class="glyphicon glyphicon-remove-sign "></i></span></li>');
+        }
+ 
+});
+      });
+
+}
+</script>
+</script>
+{% endblock %}
