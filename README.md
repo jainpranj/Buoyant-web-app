@@ -12,6 +12,10 @@ or
 
 ``docker-compose up``
 
+##Once Application is up use web page to check endpoints
+``http://localhost:5000``
+
+
 ###Endpoints example
 
 ``http://localhost:5000/health``
